@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.elsamag.com/v1/logistics-anomaly-thresholds.json",
+  "project": "sql-logistics-aerologix-container-audit-engine",
+  "enterprise_practice": "Elsamag IT Solutions",
+  "lead_technical_consultant": "Samuel Chinwendu Agu",
+  "version": "1.0.0",
+  "environment": "production",
+  "assertion_suite": {
+    "quarantine_unassigned_records": true,
+    "halt_on_critical_violation": false,
+    "log_level": "WARNING"
+  },
+  "schema_assertions": {
+    "container_id": {
+      "regex_pattern": "^CONT-(AIR|OCN)-[0-9]{5}$",
+      "allow_null": false,
+      "enforce_unique": true,
+      "action_on_failure": "FLAG_CRITICAL_DISCREPANCY"
+    },
+    "booking_ref": {
+      "regex_pattern": "^BK-[0-9]{6}-[A-Z]$",
+      "allow_null": false,
+      "action_on_failure": "FLAG_INVALID_MANIFEST"
+    },
+    "transport_mode": {
+      "allowed_values": [
+        "AIR_FREIGHT",
+        "OCEAN_FREIGHT"
+      ],
+      "allow_null": false,
+      "action_on_failure": "QUARANTINE_RECORD"
+    }
+  },
+  "anomaly_thresholds": {
+    "gross_weight_kg": {
+      "min_tolerance": 5.0,
+      "max_tolerance": 45000.0,
+      "variance_pct_alert_threshold": 15.0,
+      "action_on_breach": "FLAG_WEIGHT_DISCREPANCY"
+    },
+    "manifest_latency_hours": {
+      "max_acceptable_delay": 48.0,
+      "action_on_breach": "ALERT_DISPATCH_LATENCY"
+    },
+    "customs_unregistered_hold_limit": {
+      "max_unlinked_containers_per_batch": 25,
+      "action_on_breach": "CIRCUIT_BREAKER_PIPELINE_PAUSE"
+    }
+  }
+}
